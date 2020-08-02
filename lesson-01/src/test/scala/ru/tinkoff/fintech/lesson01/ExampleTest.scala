@@ -7,4 +7,8 @@ class ExampleTest extends AnyFlatSpecLike with Matchers {
   it should "pass test" in {
     1 shouldBe 1
   }
+
+  it should "pass new test" in {
+    2 shouldBe 2
+  }
 }
