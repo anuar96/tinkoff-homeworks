@@ -2,7 +2,6 @@ package homework
 
 import scala.util.Random
 
-
 case class Wealth(money: Double, armyPower: Long)
 
 trait GreatHouse{
@@ -17,14 +16,12 @@ trait CallDragon extends Ability {
   this: GreatHouse =>
 
   def callDragon: Wealth = wealth.copy(armyPower = wealth.armyPower * 2)
-
 }
 
 trait BorrowMoney extends Ability {
   this: GreatHouse =>
 
   def borrowMoney: Wealth = wealth.copy(money = wealth.money * random.nextInt(500))
-
 }
 
 trait MakeWildFire extends Ability{
@@ -38,8 +35,8 @@ case class Lannisters(wealth: Wealth) extends GreatHouse with BorrowMoney with M
 case class Targaryen(wealth: Wealth) extends GreatHouse with CallDragon with MakeWildFire
 
 case class GameOfThrones(lannisters: Lannisters, targaryen: Targaryen, turn: Long) {
-  def nextTurn(lannistterMove: () => Wealth)(targeryenMove: () => Wealth): GameOfThrones = {
-    GameOfThrones(Lannisters(lannistterMove()), Targaryen(targeryenMove()), turn + 1)
+  def nextTurn(lannisterMove: Lannisters => Wealth)(targeryenMove: Targaryen => Wealth): GameOfThrones = {
+    GameOfThrones(Lannisters(lannisterMove(lannisters)), Targaryen(targeryenMove(targaryen)), turn + 1)
   }
 
   def whoIsWinning(): GreatHouse = {
@@ -52,11 +49,11 @@ case class GameOfThrones(lannisters: Lannisters, targaryen: Targaryen, turn: Lon
 
 object Main extends App{
   val lannisters = Lannisters(Wealth(100, 200))
-  val targeryen = Targaryen(Wealth(101, 199))
+  val targeryen = Targaryen(Wealth(100, 200))
 
-  println(GameOfThrones(lannisters, targeryen, 1)
-    .nextTurn(() => lannisters.borrowMoney)(() => targeryen.callDragon)
-    .nextTurn(() => lannisters.makeWildFire)(() => targeryen.makeWildFire)
-    .whoIsWinning()
-  )
+  val game = GameOfThrones(lannisters, targeryen, 1)
+    .nextTurn(lannisters => lannisters.borrowMoney)(targaryen => targaryen.callDragon)
+    .nextTurn(lannisters => lannisters.makeWildFire)(targaryen => targaryen.callDragon)
+
+  println(game)
 }
