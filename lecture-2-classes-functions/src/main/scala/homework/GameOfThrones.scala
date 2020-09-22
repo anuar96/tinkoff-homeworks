@@ -11,10 +11,6 @@ trait GreatHouse{
 
 trait Ability{
   val random = new Random()
-
-  def abs(n: Long): Long ={
-    if (n < 0) -n else n
-  }
 }
 
 trait CallDragon extends Ability {
@@ -27,7 +23,7 @@ trait CallDragon extends Ability {
 trait BorrowMoney extends Ability {
   this: GreatHouse =>
 
-  def borrowMoney: Wealth = wealth.copy(money = wealth.money * random.nextInt(500).abs)
+  def borrowMoney: Wealth = wealth.copy(money = wealth.money * random.nextInt(500))
 
 }
 
