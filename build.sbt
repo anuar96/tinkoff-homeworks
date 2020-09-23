@@ -5,7 +5,11 @@ version := "0.1"
 scalaVersion := "2.13.3"
 
 lazy val root = (project in file("."))
-  .aggregate(`lesson-01`, `lecture-2-classes-functions`)
+  .aggregate(
+    `lesson-01`, 
+    `lecture-2-classes-functions`, 
+    `lecture-3-pattern-match-adt`
+  )
 
 lazy val `lesson-01` = (project in file("lesson-01"))
   .settings(
@@ -13,3 +17,4 @@ lazy val `lesson-01` = (project in file("lesson-01"))
   )
 
   lazy val `lecture-2-classes-functions` = project
+  lazy val `lecture-3-pattern-match-adt` = project
