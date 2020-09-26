@@ -27,7 +27,7 @@ trait BorrowMoney extends Ability {
 trait MakeWildFire extends Ability{
   this: GreatHouse =>
 
-  def makeWildFire: Wealth = wealth.copy(armyPower = wealth.armyPower * random.nextInt(1000).abs)
+  def makeWildFire: Wealth = wealth.copy(armyPower = wealth.armyPower * random.nextInt(1000))
 }
 
 case class Lannisters(wealth: Wealth) extends GreatHouse with BorrowMoney with MakeWildFire
@@ -52,8 +52,8 @@ object Main extends App{
   val targeryen = Targaryen(Wealth(100, 200))
 
   val game = GameOfThrones(lannisters, targeryen, 1)
-    .nextTurn(lannisters => lannisters.borrowMoney)(targaryen => targaryen.callDragon)
-    .nextTurn(lannisters => lannisters.makeWildFire)(targaryen => targaryen.callDragon)
+    .nextTurn(_.borrowMoney)(_.callDragon)
+    .nextTurn(_.makeWildFire)(_.callDragon)
 
   println(game)
 }
