@@ -1,0 +1,44 @@
+@startuml
+    if(Нужен доступ к элементам по ключу) then (да)
+        :Map;
+        if(Нужен обход в порядке вставки) then (да)
+            #PaleGreen:SeqMap;
+            stop
+        else if(Нужен обход в определенном порядке или range) then (да)
+            #PaleGreen:TreeMap;
+            stop
+        else (нет)
+            #PaleGreen:HashMap\n *Map;
+            stop
+        endif;
+    else (нет)
+        if(Гарантируем уникальность элементов) then (да)
+            :Set;
+            if(Нужен обход в порядке вставки) then (да)
+                #PaleGreen:ListSet;
+                stop
+            else if(Нужен обход в определенном порядке или range) then (да)
+                #PaleGreen:TreeSet;
+                stop
+            else
+                #PaleGreen:HashSet\n *Set;
+                stop
+            endif;
+        else (нет)
+            :Seq;
+            if(Диапазон с шагом от и до) then (да)
+                #PaleGreen:Range;
+                stop
+            else if(FIFO) then (да)
+                #PaleGreen:Queue;
+                stop
+            else if(Работаем только с "головой") then (да)
+                #PaleGreen:List\n *Seq;
+                stop
+            else
+                #PaleGreen:Vector\n *IndexedSeq;
+                stop
+            endif;
+        endif;
+    endif;
+@enduml
