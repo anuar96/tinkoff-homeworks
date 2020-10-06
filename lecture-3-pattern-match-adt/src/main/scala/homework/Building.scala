@@ -12,11 +12,9 @@ object Building{
   }
   def countOldManFloors(building: Building, olderThen: Int): Int = {
     protoFold(building, 0){
-      case (prev, floor) =>
-        if (floor.firstResident.age > olderThen && floor.firstResident.sex == Male
-          || floor.secondResident.age > olderThen && floor.secondResident.sex == Male)
-          prev + 1
-        else prev
+      case (prev, LivingFloor(Resident(age, Male), _, _)) if age > olderThen => prev + 1
+      case (prev, LivingFloor(_, Resident(age, Male), _)) if age > olderThen => prev + 1
+      case (prev, _) => prev
     }
   }
   def womanMaxAge(building: Building):Int = {

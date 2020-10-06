@@ -6,7 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class Homework03Test extends AnyFunSuite {
   val tree: Node = Node(32,RedLeaf, Node(2,Node(150,GreenLeaf ,GreenLeaf),YellowLeaf))
   test("countYellowAndRedValues") {
-    assert(Tree.countYellowAndRedValues(tree) == 2)
+    assert(Tree.countYellowAndRedValues(tree) == 184)
   }
 
   test("maxValue") {
