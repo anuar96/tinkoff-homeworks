@@ -1,18 +1,20 @@
 package collections
 
+import scala.collection.immutable.Stream.Empty
+
 import crutch.NothingFixes
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 /**
-  * Задания среднего уровня - требуют немного подумать,
-  * но решение достаточно прямолинейно вытекает из постановки.
-  *
-  * Все задания необходимо решать используя иммутабельные коллекции,
-  * т.е. scala.collection._ и scala.collection.immutable._
-  * 
-  * Для запуска тестов только в этом файле: `sbt testOnly *.Collections2_Normal`
-  */
+ * Задания среднего уровня - требуют немного подумать,
+ * но решение достаточно прямолинейно вытекает из постановки.
+ *
+ * Все задания необходимо решать используя иммутабельные коллекции,
+ * т.е. scala.collection._ и scala.collection.immutable._
+ *
+ * Для запуска тестов только в этом файле: `sbt testOnly *.Collections2_Normal`
+ */
 class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
 
   // Это задание необходимо выполнить без использования методов конкатенации коллекций (:::, ++ etc)
@@ -22,9 +24,9 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
     val list1 = List(1, 2, 3)
     val list2 = List(4, 5, 6)
 
-    val `list1 concat list2` = ??? // TODO
-    val `reversed list1 concat list2` = ??? // TODO
-    val `list1 concat reversed list2` = ??? // TODO
+    val `list1 concat list2`: List[Int] = List(list1, list2).flatten
+    val `reversed list1 concat list2` = List(list1.reverse, list2).flatten
+    val `list1 concat reversed list2` = List(list1, list2.reverse).flatten
 
     `list1 concat list2` shouldBe List(1, 2, 3, 4, 5, 6)
     `reversed list1 concat list2` shouldBe List(3, 2, 1, 4, 5, 6)
@@ -34,7 +36,16 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
   // В списке чисел нужно найти число с самым большим числом повторений, и вернуть новый список без этого числа
   // Если есть несколько разных чисел с одинаковой (максимальной) частотой, то удалить их все
   test("Удаление самого частого числа") {
-    def removeMostFrequent(numbers: Seq[Int]): Seq[Int] = ??? // TODO
+    def removeMostFrequent(numbers: Seq[Int]): Seq[Int] = {
+      val repeatRate: Map[Int, Int] = numbers.groupBy(identity).mapValues(_.size)
+      repeatRate match {
+        case _ if repeatRate.isEmpty => Seq()
+        case _ =>
+          val maxRepeteadCount = repeatRate.maxBy(_._2)._2
+          val maxRepeteadKeys = repeatRate.filter { case (_, b) => b == maxRepeteadCount }.keys.toSeq
+          numbers.filterNot(maxRepeteadKeys.contains(_))
+      }
+    }
 
     removeMostFrequent(Seq()) shouldBe Seq()
     removeMostFrequent(Seq(1)) shouldBe Seq()
@@ -45,7 +56,16 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
   // Для каждого элемента списка, нужно заменить его на среднее арифметическое этого элемента и двух соседних
   // Если какого-то из соседних элементов нет, то среднее необходимо считать не по 3, а по 2 или 1 значению.
   test("Сглаживание списка чисел") {
-    def smoothNumbers(numbers: Seq[Int]): Seq[Double] = ??? // TODO
+    def smoothNumbers(numbers: Seq[Int]) = {
+      val newNumbers = None +: numbers.map(Some(_)) :+ None
+      newNumbers.sliding(3, 1).toSeq.flatMap {
+        case Seq(None, Some(b), None) => Seq(b.toDouble)
+        case Seq(None, Some(b), Some(c)) => Seq((b + c).toDouble / 2)
+        case Seq(Some(a), Some(b), Some(c)) => Seq((a + b + c).toDouble / 3)
+        case Seq(Some(a), Some(b), None) => Seq((a + b).toDouble / 2)
+        case Seq(None, None) => Seq()
+      }
+    }
 
     smoothNumbers(Seq()) shouldBe Seq()
     smoothNumbers(Seq(3)) shouldBe Seq(3.0d)
@@ -66,7 +86,13 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
   test("Смена имен") {
     case class User(lastName: String, firstName: String, middleName: String)
 
-    def swapNames(users: Seq[User]): Seq[User] = ??? // TODO
+    def swapNames(users: Seq[User]): Seq[User] = {
+      users.groupBy(_.lastName).map{
+        case (lastName, users) => users.map{user =>
+          users.find(_.firstName != user.firstName).getOrElse(user)
+        }
+      }.toSeq.flatten
+    }
 
     val original = Seq(
       User("Иванов", "Иван", "Иванович"),
@@ -84,9 +110,9 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
       User("Иванов", "Иван", "Петрович"),
       User("Петров", "Василий", "Абрамович")
     ))
-    swapped should contain oneOf (User("Сидоров", "Артем", "Григорьевич"), User("Сидоров", "Виктор", "Григорьевич"))
-    swapped should contain oneOf (User("Сидоров", "Александр", "Викторович"), User("Сидоров", "Виктор", "Викторович"))
-    swapped should contain oneOf (User("Сидоров", "Александр", "Львович"), User("Сидоров", "Артем", "Львович"))
+    swapped should contain oneOf(User("Сидоров", "Артем", "Григорьевич"), User("Сидоров", "Виктор", "Григорьевич"))
+    swapped should contain oneOf(User("Сидоров", "Александр", "Викторович"), User("Сидоров", "Виктор", "Викторович"))
+    swapped should contain oneOf(User("Сидоров", "Александр", "Львович"), User("Сидоров", "Артем", "Львович"))
     swapped should not contain atLeastOneElementOf(original.filterNot(_.lastName == "Петров"))
 
   }
