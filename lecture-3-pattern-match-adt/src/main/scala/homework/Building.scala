@@ -19,9 +19,9 @@ object Building{
   }
   def womanMaxAge(building: Building):Int = {
     protoFold(building, 0){
-      case (prev, LivingFloor(Resident(age1, Female), Resident(age2, Female), _)) if age1.max(age2) > prev => age1 max age2
-      case (prev, LivingFloor(Resident(age1, Female), _, _)) if age1 > prev => age1
-      case (prev, LivingFloor(_, Resident(age2, Female), _)) if age2 > prev => age2
+      case (prev, LivingFloor(Resident(age1, Female), Resident(age2, Female), _))  => age1 max age2 max prev
+      case (prev, LivingFloor(Resident(age1, Female), _, _)) => age1 max prev
+      case (prev, LivingFloor(_, Resident(age2, Female), _)) => age2 max prev
       case (prev, _) => prev
     }
   }
