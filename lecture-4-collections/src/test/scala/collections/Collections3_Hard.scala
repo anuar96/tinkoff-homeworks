@@ -21,7 +21,23 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
    * Алгоритмическая сложность метода должна быть не больше, чем у алгоритма сортировки из стандартной библиотеки
    */
   test("Сортировка четных и нечетных чисел в разную сторону") {
-    def sortEvenUpOddDown(numbers: Seq[Int]): Seq[Int] = ??? // TODO
+    def sortEvenUpOddDown(numbers: Seq[Int]): Seq[Int] = {
+      val evens: IndexedSeq[Int] = numbers.filter(_ % 2 == 0).sorted.toIndexedSeq
+      val odds: IndexedSeq[Int] = numbers.filter(_ % 2 == 1).sortBy(-_).toIndexedSeq
+
+      var oddsIndex = 0
+      var evensIndex = 0
+      numbers.map{ number =>
+        if (number % 2 == 1){
+          oddsIndex = oddsIndex + 1
+          odds(oddsIndex - 1)
+        }
+        else{
+          evensIndex = evensIndex + 1
+          evens(evensIndex - 1)
+        }
+      }
+    }
 
     sortEvenUpOddDown(Seq()) shouldBe Seq()
     sortEvenUpOddDown(Seq(5)) shouldBe Seq(5)
