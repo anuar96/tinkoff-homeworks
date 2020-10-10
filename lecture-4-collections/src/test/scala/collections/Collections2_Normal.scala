@@ -87,8 +87,8 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
     case class User(lastName: String, firstName: String, middleName: String)
 
     def swapNames(users: Seq[User]): Seq[User] = {
-      users.map{user =>
-        users.collectFirst{
+      users.map { user =>
+        users.collectFirst {
           case User(user.lastName, firstName, middleName) if firstName != user.firstName =>
             user.copy(firstName = firstName)
         }.getOrElse(user)
@@ -123,7 +123,9 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
   test("Сортировка по фамилии и возрасту") {
     case class User(lastName: String, firstName: String, middleName: String, age: Int)
 
-    def sortUsers(users: Seq[User]): Seq[User] = ??? // TODO
+    def sortUsers(users: Seq[User]): Seq[User] = {
+      users.sortBy(r => (r.lastName, -r.age, r.firstName, r.middleName))
+    }
 
     val sorted = sortUsers(
       Seq(
