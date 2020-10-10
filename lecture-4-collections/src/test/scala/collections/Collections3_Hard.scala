@@ -55,32 +55,19 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
   // Нужно посчитать сколько (максимум) уникальных покемонов сможет собрать Анатолий,
   // с учетом того что покемонов в местном дворе он может ловить в любом количестве.
   test("Gotta catch em' all!") {
-    def numberOfAttainablePokemons(local: Set[String],
-                                   evolutionTable: Map[String,String]): Set[String] ={
-      def collect(collected: Set[String], runTimes: Int): Set[String] ={
-        if (runTimes == 0) collected
-        else{
-          val currentCollected = evolutionTable.collect{
-            case (from, to) if collected.contains(from) => to
-          }
-          collect(collected ++ currentCollected.toSet, runTimes - 1)
+    def collect(collected: Set[String], runTimes: Int, evolutionTable: Map[String,String]): Set[String] ={
+      if (runTimes == 0) collected
+      else{
+        val currentCollected = evolutionTable.collect{
+          case (from, to) if collected.contains(from) => to
         }
+        collect(collected ++ currentCollected.toSet, runTimes - 1, evolutionTable)
       }
-      collect(local, evolutionTable.size)
     }
 
     def numberOfAttainablePokemonsFinite(given: Seq[String], evolutionTable: Map[String, String]): Int ={
-      def collect(collected: Set[String], runTimes: Int): Set[String] ={
-        if (runTimes == 0) collected
-        else{
-          val currentCollected = evolutionTable.collect{
-            case (from, to) if collected.contains(from) => to
-          }
-          collect(collected ++ currentCollected.toSet, runTimes - 1)
-        }
-      }
       given.groupBy(identity).map { case (_, pokemons) =>
-        val collectedNumber = collect(pokemons.toSet, evolutionTable.size).size
+        val collectedNumber = collect(pokemons.toSet, evolutionTable.size, evolutionTable).size
         collectedNumber min pokemons.size
       }.sum
     }
@@ -107,28 +94,13 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
     val anatolyPokemons = Seq("bulbasaur", "charmander", "caterpie", "pidgey", "weedle",
       "squirtle", "squirtle", "rattata", "pidgey", "rattata", "weedle", "kakuna")
 
-    val a = Set("caterpie", "metapod", "butterfree", "rattata", "ratticate", "pidgey", "pidgeotto",
-      "pidgeot", "pikachu", "raichu", "diglett", "dugtrio")
-
-    val c = Set("bulbasaur", "kakuna",
-      "wartotle", "charmeleon", "charmander", "squirtle", "beedrill", "metapod", "ivysaur")
-
-    val b = Set("bulbasaur", "charmander", "caterpie", "pidgey", "rattata", "weedle", "ratticate",
-      "beedrill", "kakuna", "squirtle", "wartotle")
-
-    val d = Set("weedle", "bulbasaur", "ratticate", "caterpie", "pidgeotto", "rattata",
-      "kakuna", "wartotle", "pidgey", "charmander", "squirtle")
-
     val finite = anatolyPokemons.collect{
       case pokemon if !`local pokemon types`.contains(pokemon) => pokemon
     }
 
-    val maxEvolved: Int = numberOfAttainablePokemons(`local pokemon types`, evolutionTable).size +
+    val maxEvolved: Int = collect(`local pokemon types`, evolutionTable.size, evolutionTable).size +
       numberOfAttainablePokemonsFinite(finite, evolutionTable)
 
-//    val maxEvolved = (a ++ b).size
-    numberOfAttainablePokemons(`local pokemon types`, evolutionTable) should contain theSameElementsAs a
-/*    numberOfAttainablePokemonsFinite(anatolyPokemons, evolutionTable) should contain theSameElementsAs b*/
     maxEvolved shouldBe 19
   }
 }
