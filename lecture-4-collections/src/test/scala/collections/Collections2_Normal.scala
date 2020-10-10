@@ -87,11 +87,12 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes {
     case class User(lastName: String, firstName: String, middleName: String)
 
     def swapNames(users: Seq[User]): Seq[User] = {
-      users.groupBy(_.lastName).map{
-        case (lastName, users) => users.map{user =>
-          users.find(_.firstName != user.firstName).getOrElse(user)
-        }
-      }.toSeq.flatten
+      users.map{user =>
+        users.collectFirst{
+          case User(user.lastName, firstName, middleName) if firstName != user.firstName =>
+            user.copy(firstName = firstName)
+        }.getOrElse(user)
+      }
     }
 
     val original = Seq(
