@@ -3,7 +3,7 @@ package collections
 import crutch.NothingFixes
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-
+import crutch.NothingFixes
 /**
   * Задания легкого уровня - для ознакомления с API коллекций.
   * API документация: https://www.scala-lang.org/api/current/scala/collection/index.html
