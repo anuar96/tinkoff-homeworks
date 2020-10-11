@@ -3,6 +3,7 @@ package collections
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import crutch.NothingFixes
+
 /**
   * Задания легкого уровня - для ознакомления с API коллекций.
   * API документация: https://www.scala-lang.org/api/current/scala/collection/index.html
@@ -15,7 +16,7 @@ import crutch.NothingFixes
   *
   * Для запуска тестов только в этом файле: `sbt testOnly *.Collections1_Easy`
   */
-class Collections1_Easy extends AnyFunSuite with Matchers {
+class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
 
   test("Создание коллекций") {
     val emptySeq = Seq.empty

@@ -2,6 +2,7 @@ package collections
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import crutch.NothingFixes
 
 /**
  * Задания среднего уровня - требуют немного подумать,
@@ -12,7 +13,7 @@ import org.scalatest.matchers.should.Matchers
  *
  * Для запуска тестов только в этом файле: `sbt testOnly *.Collections2_Normal`
  */
-class Collections2_Normal extends AnyFunSuite with Matchers {
+class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
 
   // Это задание необходимо выполнить без использования методов конкатенации коллекций (:::, ++ etc)
   // Что должно получиться - можно видеть в тестовых данных.
