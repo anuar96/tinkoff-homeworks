@@ -1,25 +1,35 @@
 package ru.tinkoff.fintech.lecture03
 
+import homework._
 import org.scalatest.funsuite.AnyFunSuite
 
 class Homework03Test extends AnyFunSuite {
+  val tree: Node = Node(32,RedLeaf, Node(2,Node(150,GreenLeaf ,GreenLeaf),YellowLeaf))
   test("countYellowAndRedValues") {
-    assert(1 == 1)
+    assert(Tree.countYellowAndRedValues(tree) == 184)
   }
 
   test("maxValue") {
-    assert(1 == 1)
+    assert(Tree.maxValue(tree).contains(150))
   }
 
+  val building: Building = Building("moscow leninskie gory street 1",
+    LivingFloor(Resident(12, Female), Resident(40, Female),
+      LivingFloor(Resident(14, Male), Resident(32, Male), LivingFloor(Resident(22, Female), Resident(23, Male), Attic))
+    ))
+
   test("protoFold") {
-    assert(1 == 1)
+    val result = Building.protoFold(building, 0){case (int, floor) => int}
+    assert(result == 0)
   }
 
   test("countOldManFloors") {
-    assert(1 == 1)
+    val result = Building.countOldManFloors(building,31)
+    assert(result == 1)
   }
 
   test("womanMaxAge") {
-    assert(1 == 1)
+    val result = Building.womanMaxAge(building)
+    assert(result == 40)
   }
 }
