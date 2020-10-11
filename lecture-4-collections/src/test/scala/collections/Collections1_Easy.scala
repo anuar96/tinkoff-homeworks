@@ -1,6 +1,5 @@
 package collections
 
-import crutch.NothingFixes
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import crutch.NothingFixes
@@ -16,7 +15,7 @@ import crutch.NothingFixes
   *
   * Для запуска тестов только в этом файле: `sbt testOnly *.Collections1_Easy`
   */
-class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes {
+class Collections1_Easy extends AnyFunSuite with Matchers {
 
   test("Создание коллекций") {
     val emptySeq = Seq.empty
