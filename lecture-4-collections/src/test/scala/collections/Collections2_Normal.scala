@@ -35,7 +35,7 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
   // Если есть несколько разных чисел с одинаковой (максимальной) частотой, то удалить их все
   test("Удаление самого частого числа") {
     def removeMostFrequent(numbers: Seq[Int]): Seq[Int] = {
-      val repeatRate: Map[Int, Int] = numbers.groupBy(identity).mapValues(_.size)
+      val repeatRate: Map[Int, Int] = numbers.groupBy(identity).view.mapValues(_.size).toMap
       repeatRate match {
         case _ if repeatRate.isEmpty => Seq()
         case _ =>

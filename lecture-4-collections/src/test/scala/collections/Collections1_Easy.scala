@@ -141,7 +141,7 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
   test("Число повторений") {
     val seq = Seq(1, 2, 2, 3, 4, 5, 6, 5, 6, 5, 9)
 
-    val frequency: Map[Int, Int] = seq.groupBy(identity).mapValues(_.size)
+    val frequency = seq.groupBy(identity).view.mapValues(_.size).toMap
 
     frequency should contain theSameElementsAs (Map(
       1 -> 1,
