@@ -29,12 +29,12 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
 
       var oddsIndex = 0
       var evensIndex = 0
-      numbers.map{ number =>
-        if (number % 2 == 1){
+      numbers.map { number =>
+        if (number % 2 == 1) {
           oddsIndex = oddsIndex + 1
           odds(oddsIndex - 1)
         }
-        else{
+        else {
           evensIndex = evensIndex + 1
           evens(evensIndex - 1)
         }
@@ -55,19 +55,24 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
   // Нужно посчитать сколько (максимум) уникальных покемонов сможет собрать Анатолий,
   // с учетом того что покемонов в местном дворе он может ловить в любом количестве.
   test("Gotta catch em' all!") {
-    def collect(collected: Set[String], runTimes: Int, evolutionTable: Map[String,String]): Set[String] ={
-      if (runTimes == 0) collected
-      else{
-        val currentCollected = evolutionTable.collect{
-          case (from, to) if collected.contains(from) => to
+    //all pokemons that can be collected
+    def collect(collected: Set[String], evolutionTable: Map[String, String]): Set[String] ={
+      def collect1(collected: Set[String], evolutionTable: Map[String, String], runTimes: Int): Set[String] = {
+        if (runTimes == 0) collected
+        else {
+          val currentCollected = evolutionTable.collect {
+            case (from, to) if collected.contains(from) => to
+          }
+          collect1(collected ++ currentCollected.toSet, evolutionTable, runTimes - 1)
         }
-        collect(collected ++ currentCollected.toSet, runTimes - 1, evolutionTable)
       }
+      collect1(collected, evolutionTable, evolutionTable.size)
     }
 
-    def numberOfAttainablePokemonsFinite(given: Seq[String], evolutionTable: Map[String, String]): Int ={
+
+    def numberOfAttainablePokemonsFinite(given: Seq[String], evolutionTable: Map[String, String]): Int = {
       given.groupBy(identity).map { case (_, pokemons) =>
-        val collectedNumber = collect(pokemons.toSet, evolutionTable.size, evolutionTable).size
+        val collectedNumber = collect(pokemons.toSet, evolutionTable).size
         collectedNumber min pokemons.size
       }.sum
     }
@@ -94,11 +99,11 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
     val anatolyPokemons = Seq("bulbasaur", "charmander", "caterpie", "pidgey", "weedle",
       "squirtle", "squirtle", "rattata", "pidgey", "rattata", "weedle", "kakuna")
 
-    val finite = anatolyPokemons.collect{
+    val finite = anatolyPokemons.collect {
       case pokemon if !`local pokemon types`.contains(pokemon) => pokemon
     }
 
-    val maxEvolved: Int = collect(`local pokemon types`, evolutionTable.size, evolutionTable).size +
+    val maxEvolved: Int = collect(`local pokemon types`, evolutionTable).size +
       numberOfAttainablePokemonsFinite(finite, evolutionTable)
 
     maxEvolved shouldBe 19
