@@ -1,22 +1,24 @@
 package collections
 
+import scala.collection.immutable.{ListMap, ListSet}
+
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import crutch.NothingFixes
 
 /**
-  * Задания легкого уровня - для ознакомления с API коллекций.
-  * API документация: https://www.scala-lang.org/api/current/scala/collection/index.html
-  * Описание коллекций https://docs.scala-lang.org/overviews/collections-2.13/introduction.html
-  *
-  * Все задания необходимо решать используя иммутабельные коллекции,
-  * т.е. scala.collection._ и scala.collection.immutable._
-  * 
-  * Многие задания можно выполнить более чем одним способом, экспериментируйте!
-  *
-  * Для запуска тестов только в этом файле: `sbt testOnly *.Collections1_Easy`
-  */
-class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
+ * Задания легкого уровня - для ознакомления с API коллекций.
+ * API документация: https://www.scala-lang.org/api/current/scala/collection/index.html
+ * Описание коллекций https://docs.scala-lang.org/overviews/collections-2.13/introduction.html
+ *
+ * Все задания необходимо решать используя иммутабельные коллекции,
+ * т.е. scala.collection._ и scala.collection.immutable._
+ *
+ * Многие задания можно выполнить более чем одним способом, экспериментируйте!
+ *
+ * Для запуска тестов только в этом файле: `sbt testOnly *.Collections1_Easy`
+ */
+class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes {
 
   test("Создание коллекций") {
     val emptySeq = Seq.empty
@@ -24,20 +26,20 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
     emptySeq shouldBe a[Seq[_]]
     emptySeq shouldBe empty
 
-    val nonEmptySeq = Seq(1,2,3,42,5,12,3,2)
+    val nonEmptySeq = Seq(1, 2, 3, 42, 5, 12, 3, 2)
 
     nonEmptySeq shouldBe a[Seq[_]]
-    nonEmptySeq should contain allOf (1, 2, 3, 42)
+    nonEmptySeq should contain allOf(1, 2, 3, 42)
 
     val emptySet = Set.empty
 
     emptySet shouldBe a[Set[_]]
     emptySet shouldBe empty
 
-    val nonEmptySet = Set(1,2,3,42,5,12,3,2)
+    val nonEmptySet = Set(1, 2, 3, 42, 5, 12, 3, 2)
 
     nonEmptySet shouldBe a[Set[_]]
-    nonEmptySet should contain allOf (1, 2, 3, 42)
+    nonEmptySet should contain allOf(1, 2, 3, 42)
 
     val emptyMap = Map.empty
 
@@ -47,7 +49,7 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
     val nonEmptyMap = Map(1 -> 2, 3 -> 42)
 
     nonEmptyMap shouldBe a[Map[_, _]]
-    nonEmptyMap should contain allOf (1 -> 2, 3 -> 42)
+    nonEmptyMap should contain allOf(1 -> 2, 3 -> 42)
   }
 
   test("Добавление и удаление элементов последовательности") {
@@ -110,7 +112,7 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
   // Для переданной последовательности строк, вернуть общую последовательность букв в них, пропустив остальные символы
   test("Разбиение строк на символы") {
     def letterSequence(strings: Seq[String]): Seq[Char] = {
-      strings.flatMap{
+      strings.flatMap {
         _.filter(_.isLetter).toSeq
       }
     }
@@ -122,7 +124,8 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
 
   test("Вывод имени") {
     def printFullName(lastName: Option[String], firstName: Option[String], middleName: Option[String]): String =
-      (lastName.getOrElse("") + " " + firstName.getOrElse("") + " " + middleName.getOrElse("")).trim
+      Seq(lastName, firstName, middleName).flatten.mkString(" ")
+
 
     printFullName(Some("Петров"), Some("Иван"), Some("Иванович")) shouldBe "Петров Иван Иванович"
     printFullName(Some("Бонд"), Some("Джеймс"), None) shouldBe "Бонд Джеймс"
@@ -133,7 +136,7 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
   // Реализовать удаление повторов самостоятельно, не используя стандартный метод distinct
   // Порядок элементов дожен быть сохранен; из повторяющихся элементов - оставлять первый
   test("Удаление повторов (distinct)") {
-    def distinct(seq: Seq[Int]): Seq[Int] = seq.distinct
+    def distinct(seq: Seq[Int]): Seq[Int] = ListSet[Int](seq: _*).toSeq
 
     distinct(Seq(1, 2, 2, 5, 4, 5, 6)) shouldBe Seq(1, 2, 5, 4, 6)
   }
@@ -158,7 +161,9 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes{
   test("Сортировка строк по возрастанию длины") {
     val strings = Seq("bear", "tortilla", "scala", "pie")
 
-    val sorted = strings.sortWith{(a,b) => a.length < b.length}
+    val sorted = strings.sortWith {
+      (a, b) => a.length < b.length
+    }
 
     sorted shouldBe Seq("pie", "bear", "scala", "tortilla")
   }

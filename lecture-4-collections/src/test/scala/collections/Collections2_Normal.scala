@@ -22,9 +22,17 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
     val list1 = List(1, 2, 3)
     val list2 = List(4, 5, 6)
 
-    val `list1 concat list2`: List[Int] = List(list1, list2).flatten
-    val `reversed list1 concat list2` = List(list1.reverse, list2).flatten
-    val `list1 concat reversed list2` = List(list1, list2.reverse).flatten
+    val `list1 concat list2`: List[Int] = list2.foldLeft(list1){
+      case (prev, elem) => prev :+ elem
+    }
+
+    val `reversed list1 concat list2`: List[Int] = list1.foldLeft(list2){
+      case (prev, elem) => elem +: prev
+    }
+
+    val `list1 concat reversed list2` = list2.foldRight(list1){
+      case (elem, prev) => prev :+ elem
+    }
 
     `list1 concat list2` shouldBe List(1, 2, 3, 4, 5, 6)
     `reversed list1 concat list2` shouldBe List(3, 2, 1, 4, 5, 6)
@@ -40,8 +48,8 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
         case _ if repeatRate.isEmpty => Seq()
         case _ =>
           val maxRepeteadCount = repeatRate.maxBy(_._2)._2
-          val maxRepeteadKeys = repeatRate.filter { case (_, b) => b == maxRepeteadCount }.keys.toSeq
-          numbers.filterNot(maxRepeteadKeys.contains(_))
+          val maxRepeteadKeys = repeatRate.filter { case (_, b) => b == maxRepeteadCount }.keys.toSet
+          numbers.filterNot(maxRepeteadKeys.contains)
       }
     }
 
