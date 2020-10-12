@@ -70,8 +70,11 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
     }
 
 
-    def numberOfAttainablePokemonsFinite(given: Seq[String], evolutionTable: Map[String, String]): Int = {
-      given.groupBy(identity).map { case (_, pokemons) =>
+    def numberOfAttainablePokemonsFinite(anatolyPokemons: Seq[String], `local pokemon types`: Set[String], evolutionTable: Map[String, String]): Int = {
+      val finite = anatolyPokemons.collect {
+        case pokemon if !`local pokemon types`.contains(pokemon) => pokemon
+      }
+      finite.groupBy(identity).map { case (_, pokemons) =>
         val collectedNumber = collect(pokemons.toSet, evolutionTable).size
         collectedNumber min pokemons.size
       }.sum
@@ -99,12 +102,8 @@ class Collections3_Hard extends AnyFunSuite with Matchers {
     val anatolyPokemons = Seq("bulbasaur", "charmander", "caterpie", "pidgey", "weedle",
       "squirtle", "squirtle", "rattata", "pidgey", "rattata", "weedle", "kakuna")
 
-    val finite = anatolyPokemons.collect {
-      case pokemon if !`local pokemon types`.contains(pokemon) => pokemon
-    }
-
     val maxEvolved: Int = collect(`local pokemon types`, evolutionTable).size +
-      numberOfAttainablePokemonsFinite(finite, evolutionTable)
+      numberOfAttainablePokemonsFinite(anatolyPokemons, `local pokemon types`, evolutionTable)
 
     maxEvolved shouldBe 19
   }
