@@ -140,7 +140,23 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes {
       case (set, elem) => set + elem
     }.toSeq
 
+    def distinct2(seq: Seq[Int]): Seq[Int] = {
+      def dist(seq: Seq[Int], collected: Seq[Int]): Seq[Int] ={
+        if (seq.isEmpty) collected
+        else{
+          if (seq.tail.contains(seq.head)){
+            dist(seq.tail, collected)
+          }
+          else{
+            dist(seq.tail, collected :+ seq.head)
+          }
+        }
+      }
+      dist(seq.reverse, Nil).reverse
+    }
+
     distinct(Seq(1, 2, 2, 5, 4, 5, 6)) shouldBe Seq(1, 2, 5, 4, 6)
+    distinct2(Seq(1, 2, 2, 5, 4, 5, 6)) shouldBe Seq(1, 2, 5, 4, 6)
   }
 
   test("Число повторений") {
