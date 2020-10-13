@@ -136,7 +136,9 @@ class Collections1_Easy extends AnyFunSuite with Matchers with NothingFixes {
   // Реализовать удаление повторов самостоятельно, не используя стандартный метод distinct
   // Порядок элементов дожен быть сохранен; из повторяющихся элементов - оставлять первый
   test("Удаление повторов (distinct)") {
-    def distinct(seq: Seq[Int]): Seq[Int] = ListSet[Int](seq: _*).toSeq
+    def distinct(seq: Seq[Int]): Seq[Int] = seq.foldLeft(new ListSet[Int].empty){
+      case (set, elem) => set + elem
+    }.toSeq
 
     distinct(Seq(1, 2, 2, 5, 4, 5, 6)) shouldBe Seq(1, 2, 5, 4, 6)
   }

@@ -22,16 +22,20 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
     val list1 = List(1, 2, 3)
     val list2 = List(4, 5, 6)
 
-    val `list1 concat list2`: List[Int] = list2.foldLeft(list1){
-      case (prev, elem) => prev :+ elem
+    val `list1 concat list2`: List[Int] = list1.foldRight(list2){
+      case (elem, prev) => elem +: prev
     }
 
     val `reversed list1 concat list2`: List[Int] = list1.foldLeft(list2){
       case (prev, elem) => elem +: prev
     }
 
-    val `list1 concat reversed list2` = list2.foldRight(list1){
-      case (elem, prev) => prev :+ elem
+    val reversedList2 = list2.foldLeft(Nil : List[Int]){
+      case (prev, elem) => elem +: prev
+    }
+
+    val `list1 concat reversed list2` = list1.foldRight(reversedList2){
+      case (elem, prev) => elem +: prev
     }
 
     `list1 concat list2` shouldBe List(1, 2, 3, 4, 5, 6)
@@ -64,6 +68,9 @@ class Collections2_Normal extends AnyFunSuite with Matchers with NothingFixes{
   test("Сглаживание списка чисел") {
     def smoothNumbers(numbers: Seq[Int]) = {
       val newNumbers = None +: numbers.map(Some(_)) :+ None
+
+      newNumbers.sliding(3, 1).toSeq.flatten
+
       newNumbers.sliding(3, 1).toSeq.flatMap {
         case Seq(None, Some(b), None) => Seq(b.toDouble)
         case Seq(None, Some(b), Some(c)) => Seq((b + c).toDouble / 2)
