@@ -9,8 +9,7 @@ lazy val root = (project in file("."))
     `lesson-01`, 
     `lecture-2-classes-functions`, 
     `lecture-3-pattern-match-adt`,
-    `lecture-4-collections`,
-    `lecture-5-polymorphism`
+    `lecture-4-collections`
   )
 
 lazy val `lesson-01` = (project in file("lesson-01"))
@@ -22,4 +21,3 @@ lazy val `lesson-01` = (project in file("lesson-01"))
   lazy val `lecture-2-classes-functions` = project
   lazy val `lecture-3-pattern-match-adt` = project
   lazy val `lecture-4-collections` = project
-  lazy val `lecture-5-polymorphism` = project
