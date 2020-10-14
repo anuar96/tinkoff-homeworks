@@ -1,0 +1,3 @@
+package lecture6.future.assignment
+
+class InvalidCredentialsException extends RuntimeException
