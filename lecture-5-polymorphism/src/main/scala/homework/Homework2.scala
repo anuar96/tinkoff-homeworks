@@ -8,13 +8,13 @@ class Business extends ExtendedEconomy
 class Elite extends Business
 class Platinum extends Business
 
-class ServiceLevelAdvance[+T <: Economy] {
-  def advance[R <: Economy]: ServiceLevelAdvance[R] = new ServiceLevelAdvance[R]
+class ServiceLevelAdvance[-T <: Economy] {
+  def advance[R <: T]: ServiceLevelAdvance[R] = new ServiceLevelAdvance[R]
 }
 
 object Main extends App{
   val advance: ServiceLevelAdvance[UpgradedEconomy] = new ServiceLevelAdvance[UpgradedEconomy]
-  val a: ServiceLevelAdvance[Economy] = advance.advance[Economy]
+//  val a: ServiceLevelAdvance[Economy] = advance.advance[Economy]
   val b: ServiceLevelAdvance[Special1b] = advance.advance[Special1b]
 
 }

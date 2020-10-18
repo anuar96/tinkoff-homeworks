@@ -22,3 +22,6 @@ class Greeter {
   def greet(greetings: Greeting): Unit = println(greetings.text)
 }
 
+
+
+
