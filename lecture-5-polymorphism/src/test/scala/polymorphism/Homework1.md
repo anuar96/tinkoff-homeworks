@@ -1,0 +1,22 @@
+# Привязка типа 1
+
+Дан следующий фрагмент кода:
+```scala
+object Russian
+object English
+
+trait Greeting {
+  def text: String
+}
+
+
+
+class Greeter {
+  def greet(greetings: Greeting): Unit = println(greetings.text)
+}
+```
+1. Модифицировать его таким образом, чтобы Greetings и Greeter имели привязку к языку
+1. Поприветствовать русским Greeter с двумя различными русскими приветствиями
+1. Показать, что поприветствовать на чужом языке не получится 
+
+*P.S. тип синглтона получается через .type (например, Russian.type)*
