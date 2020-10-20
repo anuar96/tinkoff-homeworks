@@ -1,27 +1,38 @@
 package homework
 
-trait Language{
-  def greeting: String
+trait Language
+
+object Russian extends Language
+
+object English extends Language
+
+trait Greeting[T <: Language] {
+  def text: String
 }
 
-object Russian extends Language{
-  def greeting: String = "Привет!"
+class Greeter[T <: Language] {
+  def greet(greetings: Greeting[T]): Unit = println(greetings.text)
 }
 
-object English extends Language{
-  def greeting: String = "Hello!"
+object Main1 extends App{
+  new Greeter[Russian.type].greet(new Greeting[Russian.type]{
+    def text = "Привет!"
+  })
+  new Greeter[Russian.type].greet(
+    new Greeting[Russian.type]{
+      def text = "Добрый день!"
+    }
+  )
+  new Greeter[English.type].greet{
+    new Greeting[English.type]{
+      def text = "Hello!"
+    }
+  }
+/*  new Greeter[English.type].greet{
+    new Greeting[Russian.type]{
+      def text = "Hello1"
+    }
+  }*/ // не компилится, потому что нельзя приветствовать на другом языке
 }
-
-trait Greeting {
-  val language: Language
-  def text: String = language.greeting
-}
-
-
-class Greeter {
-  def greet(greetings: Greeting): Unit = println(greetings.text)
-}
-
-
 
 
