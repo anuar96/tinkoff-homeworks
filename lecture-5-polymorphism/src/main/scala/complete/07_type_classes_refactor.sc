@@ -75,6 +75,5 @@ object Check {
 }
 
 import Check._
-val shelter = new PetShelter(Seq(new Cat), "shelter")
 shelter.check(doctor)
 
