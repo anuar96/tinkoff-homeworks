@@ -13,7 +13,7 @@ class Projector[R](converter: Converter[R]) {
     val nextPage: Page[R] = screen.read._2
     screen.read._1 match {
       case None => project(nextPage)
-      case r: R => converter.convert(r) + project(nextPage)
+      case Some(r) => converter.convert(r) + project(nextPage)
     }
   }
 }
