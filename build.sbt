@@ -15,7 +15,8 @@ lazy val `scala-fintech-school` = project
     `lecture-3-pattern-match-adt`,
     `lecture-4-collections`,
     `lecture-5-polymorphism`,
-    `lecture-6-future`
+    `lecture-6-future`,
+    `lecture-7-functional-programming`
   )
 
 lazy val `lecture-1` = project
@@ -24,3 +25,4 @@ lazy val `lecture-3-pattern-match-adt` = project
 lazy val `lecture-4-collections` = project
 lazy val `lecture-5-polymorphism` = project
 lazy val `lecture-6-future` = project
+lazy val `lecture-7-functional-programming` = project

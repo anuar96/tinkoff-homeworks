@@ -1,0 +1,23 @@
+package lecture7
+
+object ReferentialTransparency {
+  var global = 0
+
+  def rq(x: Int): Int = {
+    global += 1
+    x * global
+  }
+
+  def p(x: Int, y: Int): Int =
+    rq(x) + rq(y) * (rq(x) - rq(x))
+
+  def p1(x: Int, y: Int): Int =
+    rq(x) + rq(y)  * 0
+
+  def p2(x: Int, y: Int): Int =
+    rq(x) + 0
+
+  def p3(x: Int, y: Int): Int =
+    rq(x)
+
+}
