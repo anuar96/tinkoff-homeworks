@@ -12,13 +12,13 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
                 (implicit executionContext: ExecutionContext) extends StrictLogging {
 
   /**
-    * проверяет пароль для пользователя
-    * возвращает Future со значением false:
-    *   - если пользователь не найден
-    *   - если пароль не подходит к хешу
-    */
+   * проверяет пароль для пользователя
+   * возвращает Future со значением false:
+   *   - если пользователь не найден
+   *   - если пароль не подходит к хешу
+   */
   def verifyCredentials(user: String, password: String): Future[Boolean] = {
-    for{
+    for {
       maybeUser: Option[String] <- credentialStore.find(user)
       hash <- bcrypt.hash(password)
       pass <- bcrypt.verify(password, hash)
@@ -28,11 +28,11 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
   }
 
   /**
-    * выполняет блок кода, только если переданы верные учетные данные
-    * возвращает Future c ошибкой InvalidCredentialsException, если проверка не пройдена
-    */
-  def withCredentials[A](user: String, password: String)(block: => A): Future[A] ={
-    verifyCredentials(user, password).flatMap{isPassed =>
+   * выполняет блок кода, только если переданы верные учетные данные
+   * возвращает Future c ошибкой InvalidCredentialsException, если проверка не пройдена
+   */
+  def withCredentials[A](user: String, password: String)(block: => A): Future[A] = {
+    verifyCredentials(user, password).flatMap { isPassed =>
       if (isPassed)
         Future.successful(block)
       else
@@ -42,36 +42,36 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
 
 
   /**
-    * хеширует каждый пароль из списка и возвращает пары пароль-хеш
-    */
-  def hashPasswordList(passwords: Seq[String]): Future[Seq[(String, String)]] ={
-    Future.sequence(passwords.map{ password =>
+   * хеширует каждый пароль из списка и возвращает пары пароль-хеш
+   */
+  def hashPasswordList(passwords: Seq[String]): Future[Seq[(String, String)]] = {
+    Future.sequence(passwords.map { password =>
       bcrypt.hash(password).map((password, _))
     })
   }
 
 
   /**
-    * проверяет все пароли из списка против хеша, и если есть подходящий - возвращает его
-    * если подходит несколько - возвращается любой
-    */
+   * проверяет все пароли из списка против хеша, и если есть подходящий - возвращает его
+   * если подходит несколько - возвращается любой
+   */
   def findMatchingPassword(passwords: Seq[String], hash: String): Future[Option[String]] = {
     for {
       hashPasswordList <- hashPasswordList(passwords)
-    } yield{
-      hashPasswordList.collectFirst{
+    } yield {
+      hashPasswordList.collectFirst {
         case (password, passwordHash) if passwordHash == hash => password
       }
     }
   }
 
   /**
-    * логирует начало и окончание выполнения Future, и продолжительность выполнения
-    */
+   * логирует начало и окончание выполнения Future, и продолжительность выполнения
+   */
   def withLogging[A](tag: String)(f: => Future[A]): Future[A] = {
     logger.debug(s"$f begin")
     val beginTime = java.lang.System.currentTimeMillis()
-    f.map{ res =>
+    f.map { res =>
       val duration = java.lang.System.currentTimeMillis() - beginTime
       logger.debug(s"$f duration is $duration")
       logger.debug(s"$f end")
@@ -80,38 +80,38 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
   }
 
   /**
-    * пытается повторно выполнить f retries раз, до первого успеха
-    * если все попытки провалены, возвращает первую ошибку
-    *
-    * Важно: f не должна выполняться большее число раз, чем необходимо
-    */
-  def withRetry[A](f: => Future[A], retries: Int): Future[A] ={
-    def go(f: => Future[A], retries: Int): Future[A] ={
+   * пытается повторно выполнить f retries раз, до первого успеха
+   * если все попытки провалены, возвращает первую ошибку
+   *
+   * Важно: f не должна выполняться большее число раз, чем необходимо
+   */
+  def withRetry[A](f: => Future[A], retries: Int): Future[A] = {
+    def go(f: => Future[A], retries: Int): Future[A] = {
       val future = f
       if (retries == 0) future else future.fallbackTo(go(future, retries - 1))
     }
+
     go(f, retries)
   }
 
   /**
-    * по истечению таймаута возвращает Future.failed с java.util.concurrent.TimeoutException
-    */
-  def withTimeout[A](f: Future[A], timeout: FiniteDuration): Future[A] ={
+   * по истечению таймаута возвращает Future.failed с java.util.concurrent.TimeoutException
+   */
+  def withTimeout[A](f: Future[A], timeout: FiniteDuration): Future[A] = {
     Future(Await.result(f, timeout))
   }
 
 
   /**
-    * делает то же, что и hashPasswordList, но дополнительно:
-    *   - каждая попытка хеширования отдельного пароля выполняется с таймаутом
-    *   - при ошибке хеширования отдельного пароля, попытка повторяется в пределах retries (свой на каждый пароль)
-    *   - возвращаются все успешные результаты
-    */
+   * делает то же, что и hashPasswordList, но дополнительно:
+   *   - каждая попытка хеширования отдельного пароля выполняется с таймаутом
+   *   - при ошибке хеширования отдельного пароля, попытка повторяется в пределах retries (свой на каждый пароль)
+   *   - возвращаются все успешные результаты
+   */
   def hashPasswordListReliably(passwords: Seq[String], retries: Int, timeout: FiniteDuration): Future[Seq[(String, String)]] = {
     hashPasswordList(passwords)
-    Future.sequence(passwords.map{ password =>
-      withRetry(
-      withTimeout(bcrypt.hash(password).map((password, _)), 10 seconds), 5)
+    Future.sequence(passwords.map { password =>
+      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), 10 seconds), 5)
     })
   }
 }
