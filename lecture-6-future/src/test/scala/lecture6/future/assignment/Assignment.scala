@@ -1,12 +1,11 @@
 package lecture6.future.assignment
 
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
+
 import com.typesafe.scalalogging.StrictLogging
 import lecture6.future.bcrypt.AsyncBcrypt
 import lecture6.future.store.AsyncCredentialStore
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Success}
-import scala.concurrent.duration._
-import com.sun.net.httpserver.Authenticator.Success
 
 class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
                 (implicit executionContext: ExecutionContext) extends StrictLogging {
