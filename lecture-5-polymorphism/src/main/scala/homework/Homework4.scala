@@ -10,10 +10,9 @@ trait Page[R] {
 
 class Projector[R](converter: Converter[R]) {
   def project(screen: Page[R]): String = {
-    val nextPage: Page[R] = screen.read._2
-    screen.read._1 match {
-      case None => project(nextPage)
-      case Some(r) => converter.convert(r) + project(nextPage)
+    screen.read match {
+      case (None, _) => ""
+      case (Some(r), nextPage) => converter.convert(r) + project(nextPage)
     }
   }
 }
@@ -32,8 +31,8 @@ object LineConverter extends Converter[WordLine] {
 
 class HelloPage[R <: WordLine](lines: Seq[R]) extends Page[R] {
   override def read: (Option[R], Page[R]) = lines match {
-    case Nil => (lines.headOption, this)
-    case _ => (lines.headOption, new HelloPage(lines.tail))
+    case head :: tail =>(Some(head), new HelloPage(tail))
+    case Nil => (None, this)
   }
 }
 
