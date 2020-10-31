@@ -42,7 +42,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     implicit def xnSimpleSyntax[M: XN](m: M): XNSimpleOps[M] = new XNSimpleOps[M](m)
 
     final class XNSimpleOps[M: XN](m: M) {
-      def xn(n: Int) = XN[M].xn(m, n)
+      def xN(n: Int) = XN[M].xn(m, n)
 
       def x2: M = XN[M].x2(m)
 
@@ -84,7 +84,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     val ring123 = Ring(Seq(1, 2, 3))
 
     Ring(ring123).x2.take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
-    Ring(ring123).xn(2).map(_.take(6).toSeq) shouldBe Success(Seq(1, 1, 2, 2, 3, 3))
+    Ring(ring123).xN(2).map(_.take(6).toSeq) shouldBe Success(Seq(1, 1, 2, 2, 3, 3))
     Ring(ring123).x3.take(9).toSeq shouldBe Seq(1, 1, 1, 2, 2, 2, 3, 3, 3)
     Ring(ring123).x4.take(12).toSeq shouldBe Seq(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3)
   }
@@ -97,7 +97,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     bobSalary.x2 shouldBe Salary("Bob", 200.0)
     bobSalary.x3 shouldBe Salary("Bob", 300.0)
     bobSalary.x4 shouldBe Salary("Bob", 400.0)
-    bobSalary.xn(2) shouldBe Success(Salary("Bob", 200.0))
+    bobSalary.xN(2) shouldBe Success(Salary("Bob", 200.0))
 
   }
 }
