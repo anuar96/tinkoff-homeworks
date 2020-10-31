@@ -1,5 +1,7 @@
 package polymorphism
 
+import scala.util.{Success, Try}
+
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
@@ -19,7 +21,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
   }
 
   trait XN[M] {
-    def xn(m: M, n : Int): M = {
+    def xn(m: M, n : Int): Try[M] = Try{
       n match{
         case 2 => x2(m)
         case 3 => x3(m)
@@ -82,7 +84,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     val ring123 = Ring(Seq(1, 2, 3))
 
     Ring(ring123).x2.take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
-    Ring(ring123).xn(2).take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
+    Ring(ring123).xn(2).map(_.take(6).toSeq) shouldBe Success(Seq(1, 1, 2, 2, 3, 3))
     Ring(ring123).x3.take(9).toSeq shouldBe Seq(1, 1, 1, 2, 2, 2, 3, 3, 3)
     Ring(ring123).x4.take(12).toSeq shouldBe Seq(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3)
   }
@@ -95,7 +97,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     bobSalary.x2 shouldBe Salary("Bob", 200.0)
     bobSalary.x3 shouldBe Salary("Bob", 300.0)
     bobSalary.x4 shouldBe Salary("Bob", 400.0)
-    bobSalary.xn(2) shouldBe Salary("Bob", 200.0)
+    bobSalary.xn(2) shouldBe Success(Salary("Bob", 200.0))
 
   }
 }
