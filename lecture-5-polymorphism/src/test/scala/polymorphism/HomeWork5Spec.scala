@@ -67,7 +67,7 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     val ring123 = Ring(Seq(1, 2, 3))
 
     Ring(ring123).x2.take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
-    Ring(ring123).xN(-2).take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
+    Ring(ring123).xN(2).take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
     Ring(ring123).x3.take(9).toSeq shouldBe Seq(1, 1, 1, 2, 2, 2, 3, 3, 3)
     Ring(ring123).x4.take(12).toSeq shouldBe Seq(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3)
   }
