@@ -18,15 +18,15 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     def apply[T](iterable: Iterable[T]): Ring[T] = new RingFromIterable[T](iterable)
   }
 
-  trait XN[M[_]] {
-    def x2[T](m: M[T]): M[T]
+  trait XN[M] {
+    def xn(m: M, n : Int): M = {
+      n match{
+        case 2 => x2(m)
+        case 3 => x3(m)
+        case 4 => x4(m)
+      }
+    }
 
-    def x3[T](m: M[T]): M[T]
-
-    def x4[T](m: M[T]): M[T]
-  }
-
-  trait XNSimple[M] {
     def x2(m: M): M
 
     def x3(m: M): M
@@ -34,20 +34,36 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     def x4(m: M): M
   }
 
-  object XNSimple {
-    def apply[M](implicit instance: XNSimple[M]): XNSimple[M] = instance
+  object XN {
+    def apply[M](implicit instance: XN[M]): XN[M] = instance
 
-    implicit def xnSimpleSyntax[M: XNSimple](m: M): XNSimpleOps[M] = new XNSimpleOps[M](m)
+    implicit def xnSimpleSyntax[M: XN](m: M): XNSimpleOps[M] = new XNSimpleOps[M](m)
 
-    final class XNSimpleOps[M: XNSimple](m: M) {
-      def x2: M = XNSimple[M].x2(m)
+    final class XNSimpleOps[M: XN](m: M) {
+      def xn(n: Int) = XN[M].xn(m, n)
 
-      def x3: M = XNSimple[M].x3(m)
+      def x2: M = XN[M].x2(m)
 
-      def x4: M = XNSimple[M].x4(m)
+      def x3: M = XN[M].x3(m)
+
+      def x4: M = XN[M].x4(m)
     }
 
-    implicit val salaryXN: XNSimple[Salary] = new XNSimple[Salary] {
+    implicit def xnSimple[T]: XN[Ring[T]] = new XN[Ring[T]] {
+      override def x2(m: Ring[T]): Ring[T] = new Ring[T] {
+        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem) }
+      }
+
+      override def x3(m: Ring[T]): Ring[T] = new Ring[T] {
+        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem, elem) }
+      }
+
+      override def x4(m: Ring[T]): Ring[T] = new Ring[T] {
+        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem, elem, elem) }
+      }
+    }
+
+    implicit val salaryXN: XN[Salary] = new XN[Salary] {
       override def x2(m: Salary): Salary = Salary(m.employee, m.amount * 2)
 
       override def x3(m: Salary): Salary = Salary(m.employee, m.amount * 3)
@@ -56,64 +72,30 @@ class HomeWork5Spec extends AnyFunSuite with Matchers {
     }
   }
 
-  object XN {
-    def apply[M[_]](implicit instance: XN[M]): XN[M] = instance
-
-    implicit def xnSyntax[M[_] : XN, T](m: M[T]): XNOps[M, T] = new XNOps[M, T](m)
-
-    final class XNOps[M[_] : XN, T](m: M[T]) {
-      def x2: M[T] = XN[M].x2(m)
-
-      def x3: M[T] = XN[M].x3(m)
-
-      def x4: M[T] = XN[M].x4(m)
-    }
-
-/*
-    implicit val salaryXN: XN[Salary] = new XN[Salary] {
-      override def x2[T](m: Salary[T]): Salary[T] = ???
-
-      override def x3[T](m: Salary[T]): Salary[T] = ???
-
-      override def x4[T](m: Salary[T]): Salary[T] = ???
-    }
-
-*/
-    implicit val ringXN2: XN[Ring] = new XN[Ring] {
-      override def x2[T](m: Ring[T]): Ring[T] = new Ring[T] {
-        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem) }
-      }
-
-      override def x3[T](m: Ring[T]): Ring[T] = new Ring[T] {
-        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem, elem) }
-      }
-
-      override def x4[T](m: Ring[T]): Ring[T] = new Ring[T] {
-        override def iterator: Iterator[T] = m.iterator.flatMap { elem => Iterator(elem, elem, elem, elem) }
-      }
-    }
-  }
-
   test("Кольцо состоит из зацикленных элементов начального списка") {
     Ring(Seq(1, 2, 3)).take(9).toSeq shouldBe Seq(1, 2, 3, 1, 2, 3, 1, 2, 3)
   }
+
   test("Ring расширен операцией xN") {
     import XN._
 
     val ring123 = Ring(Seq(1, 2, 3))
 
     Ring(ring123).x2.take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
+    Ring(ring123).xn(2).take(6).toSeq shouldBe Seq(1, 1, 2, 2, 3, 3)
     Ring(ring123).x3.take(9).toSeq shouldBe Seq(1, 1, 1, 2, 2, 2, 3, 3, 3)
     Ring(ring123).x4.take(12).toSeq shouldBe Seq(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3)
   }
 
   test("Salary расширен операцией xN") {
-    import XNSimple._
+    import XN._
 
     val bobSalary: Salary = Salary("Bob", 100.0)
 
     bobSalary.x2 shouldBe Salary("Bob", 200.0)
     bobSalary.x3 shouldBe Salary("Bob", 300.0)
     bobSalary.x4 shouldBe Salary("Bob", 400.0)
+    bobSalary.xn(2) shouldBe Salary("Bob", 200.0)
+
   }
 }
