@@ -1,7 +1,11 @@
 package lecture6.future.test
 
+import java.io.InvalidClassException
+import com.github.t3hnar.bcrypt.BCryptStrOps
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
-import lecture6.future.assignment.Assignment
+import lecture6.future.assignment.{Assignment, InvalidCredentialsException}
 import lecture6.future.bcrypt.AsyncBcryptImpl
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -43,16 +47,44 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
     }
   }
 
-  it should "not execute code block if credentials are not valid" in ???
+  it should "not execute code block if credentials are not valid" in {
+  /*  val res: Unit = Await.result(withCredentials("winnie", "poo"){
+      print("hello world")
+    }, 3 seconds)
+  */
+
+    assertThrows[InvalidCredentialsException](withCredentials("winnie", "poo"){
+      print("hello world")
+    })
+
+//    assert(res == Future.failed[InvalidCredentialsException](new InvalidCredentialsException))
+  }
 
   behavior of "hashPasswordList"
 
-  it should "return matching password-hash pairs" in ???
+  it should "return matching password-hash pairs" in {
+    for {
+      list <- hashPasswordList(Seq("pooh"))
+    } yield{
+      assert(
+        list.head._1 == "pooh" && "pooh".isBcrypted(list.head._2)
+      )
+    }
+  }
 
   behavior of "findMatchingPassword"
 
-  it should "return matching password from the list" in ???
-  it should "return None if no matching password is found" in ???
+  it should "return matching password from the list" in {
+    findMatchingPassword(Seq("odo", "qwe", "pooh"), "pooh".bcrypt).map{ pass =>
+      assert(pass.contains("pooh"))
+    }
+  }
+
+  it should "return None if no matching password is found" in {
+    findMatchingPassword(Seq("odo", "qwe", "wwweqqqqqqr"), "pooh".bcrypt).map{ pass =>
+      assert(pass.isEmpty)
+    }
+  }
 
   behavior of "withRetry"
 

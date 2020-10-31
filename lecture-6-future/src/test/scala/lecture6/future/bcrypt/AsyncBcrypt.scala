@@ -28,3 +28,6 @@ class AsyncBcryptImpl extends AsyncBcrypt with StrictLogging with ExecutionLoggi
       withExecutionLogging(s"verifying $password")(blocking(password.isBcrypted(hash)))
     }
 }
+
+
+

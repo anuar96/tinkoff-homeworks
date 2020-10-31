@@ -2,7 +2,7 @@ package lecture6.future.assignment
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
-
+import com.github.t3hnar.bcrypt._
 import com.typesafe.scalalogging.StrictLogging
 import lecture6.future.bcrypt.AsyncBcrypt
 import lecture6.future.store.AsyncCredentialStore
@@ -19,7 +19,7 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
   def verifyCredentials(user: String, password: String): Future[Boolean] = {
     for {
       maybeStoredHash: Option[String] <- credentialStore.find(user)
-      pass: Boolean <- maybeStoredHash match{
+      pass: Boolean <- maybeStoredHash match {
         case Some(storedHash) => bcrypt.verify(password, storedHash)
         case None => Future.successful[Boolean](false)
       }
@@ -33,7 +33,7 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    * возвращает Future c ошибкой InvalidCredentialsException, если проверка не пройдена
    */
   def withCredentials[A](user: String, password: String)(block: => A): Future[A] = {
-    verifyCredentials(user, password).flatMap { isPassed =>
+    verifyCredentials(user, password).flatMap { isPassed: Boolean =>
       if (isPassed)
         Future.successful(block)
       else
@@ -57,13 +57,16 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    * если подходит несколько - возвращается любой
    */
   def findMatchingPassword(passwords: Seq[String], hash: String): Future[Option[String]] = {
-    for {
+    Future(passwords.collectFirst {
+      case password if password.isBcrypted(hash) => password
+    })
+/*    for {
       hashPasswordList <- hashPasswordList(passwords)
     } yield {
       hashPasswordList.collectFirst {
-        case (password, passwordHash) if passwordHash == hash => password
+        case (password, passwordHash) if password.isBcrypted(hash) => password
       }
-    }
+    }*/
   }
 
   /**
@@ -112,7 +115,7 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
   def hashPasswordListReliably(passwords: Seq[String], retries: Int, timeout: FiniteDuration): Future[Seq[(String, String)]] = {
     hashPasswordList(passwords)
     Future.sequence(passwords.map { password =>
-      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), 10 seconds), 5)
+      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), 10.seconds), 5)
     })
   }
 }
