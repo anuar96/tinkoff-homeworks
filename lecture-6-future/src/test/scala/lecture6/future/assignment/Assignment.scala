@@ -18,11 +18,13 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    */
   def verifyCredentials(user: String, password: String): Future[Boolean] = {
     for {
-      maybeUser: Option[String] <- credentialStore.find(user)
-      hash <- bcrypt.hash(password)
-      pass <- bcrypt.verify(password, hash)
+      maybeStoredHash: Option[String] <- credentialStore.find(user)
+      pass: Boolean <- maybeStoredHash match{
+        case Some(storedHash) => bcrypt.verify(password, storedHash)
+        case None => Future.successful[Boolean](false)
+      }
     } yield {
-      maybeUser.nonEmpty && pass
+      pass
     }
   }
 

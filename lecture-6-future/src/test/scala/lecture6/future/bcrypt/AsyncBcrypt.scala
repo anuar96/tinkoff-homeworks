@@ -27,5 +27,4 @@ class AsyncBcryptImpl extends AsyncBcrypt with StrictLogging with ExecutionLoggi
     Future {
       withExecutionLogging(s"verifying $password")(blocking(password.isBcrypted(hash)))
     }
-
 }
