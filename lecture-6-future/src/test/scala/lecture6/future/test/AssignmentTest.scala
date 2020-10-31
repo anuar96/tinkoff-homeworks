@@ -23,12 +23,26 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
     }
   }
 
-  it should "return false if user does not exist in store" in ???
-  it should "return false for invalid password" in ???
+  it should "return false if user does not exist in store" in {
+    verifyCredentials("sws", "pooh").map { result =>
+      result shouldBe false
+    }
+  }
+
+  it should "return false for invalid password" in {
+    verifyCredentials("winnie", "pooh2").map { result =>
+      result shouldBe false
+    }
+  }
 
   behavior of "withCredentials"
 
-  it should "execute code block if credentials are valid" in ???
+  it should "execute code block if credentials are valid" in {
+    withCredentials("winnie", "pooh"){
+      assert(true)
+    }
+  }
+
   it should "not execute code block if credentials are not valid" in ???
 
   behavior of "hashPasswordList"
