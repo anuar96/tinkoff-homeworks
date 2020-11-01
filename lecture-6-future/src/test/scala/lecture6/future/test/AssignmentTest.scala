@@ -91,8 +91,8 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
   behavior of "withRetry"
 
   it should "return result on passed lecture6.future's success" in {
-    withRetry(Future.successful(()),2).map{ result =>
-      assert(result == ())
+    withRetry(Future.successful(1),2).map{ result =>
+      assert(result == 1)
     }
   }
 
@@ -134,19 +134,19 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
   behavior of "withTimeout"
 
   it should "return result on passed lecture6.future success" in {
-    withTimeout(Future.successful(()), 2 seconds).map{ res =>
-      assert(res == ())
+    withTimeout(Future.successful(1), 2.seconds).map{ res =>
+      assert(res == 1)
     }
   }
 
   it should "return result on passed lecture6.future failure" in {
-    withTimeout(Future.failed(new Exception), 2 seconds).recover{ case res: Throwable =>
+    withTimeout(Future.failed(new Exception), 2.seconds).recover{ case res: Throwable =>
       assert(res.getClass == (new Exception).getClass)
     }
   }
 
   it should "complete on never-completing lecture6.future" in {
-    withTimeout(Future.never, 2 seconds).recover{ case res: Throwable =>
+    withTimeout(Future.never, 2.seconds).recover{ case res: Throwable =>
       assert(res.getClass == (new TimeoutException).getClass)
     }
   }
