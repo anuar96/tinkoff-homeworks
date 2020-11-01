@@ -60,25 +60,25 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
     Future(passwords.collectFirst {
       case password if password.isBcrypted(hash) => password
     })
-/*    for {
-      hashPasswordList <- hashPasswordList(passwords)
-    } yield {
-      hashPasswordList.collectFirst {
-        case (password, passwordHash) if password.isBcrypted(hash) => password
-      }
-    }*/
+    /*    for {
+          hashPasswordList <- hashPasswordList(passwords)
+        } yield {
+          hashPasswordList.collectFirst {
+            case (password, passwordHash) if password.isBcrypted(hash) => password
+          }
+        }*/
   }
 
   /**
    * логирует начало и окончание выполнения Future, и продолжительность выполнения
    */
   def withLogging[A](tag: String)(f: => Future[A]): Future[A] = {
-    logger.debug(s"$f begin")
+    logger.debug(s"$tag begin")
     val beginTime = java.lang.System.currentTimeMillis()
     f.map { res =>
       val duration = java.lang.System.currentTimeMillis() - beginTime
-      logger.debug(s"$f duration is $duration")
-      logger.debug(s"$f end")
+      logger.debug(s"$tag duration is $duration")
+      logger.debug(s"$tag end")
       res
     }
   }
@@ -91,8 +91,14 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    */
   def withRetry[A](f: => Future[A], retries: Int): Future[A] = {
     def go(f: => Future[A], retries: Int): Future[A] = {
-      val future = f
-      if (retries == 0) future else future.fallbackTo(go(future, retries - 1))
+      val future: Future[A] = f
+      if (retries == 1) future
+      else future.recoverWith {
+        case t: Throwable =>
+          go(f, retries - 1).recoverWith { case _ =>
+            Future.failed(t)
+          }
+      }
     }
 
     go(f, retries)
@@ -113,9 +119,8 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    *   - возвращаются все успешные результаты
    */
   def hashPasswordListReliably(passwords: Seq[String], retries: Int, timeout: FiniteDuration): Future[Seq[(String, String)]] = {
-    hashPasswordList(passwords)
     Future.sequence(passwords.map { password =>
-      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), 10.seconds), 5)
+      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), timeout), retries)
     })
   }
 }
