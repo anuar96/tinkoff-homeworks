@@ -54,8 +54,8 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
       print("hello world")
     }.map(_ => assert(false))
       .recover { case t: Throwable =>
-      assert(t.isInstanceOf[InvalidCredentialsException])
-    }
+        assert(t.isInstanceOf[InvalidCredentialsException])
+      }
   }
 
   behavior of "hashPasswordList"
@@ -150,9 +150,9 @@ class AssignmentTest extends AsyncFlatSpec with Matchers {
   behavior of "hashPasswordListReliably"
   val assignmentFlaky = new Assignment(new FlakyBcryptWrapper(reliableBcrypt), credentialStore)
 
-  /*  it should "return password-hash pairs for successful hashing operations" in {
-      hashPasswordListReliably(Seq("pooh", "credit", "sxs123"), 3, 5 seconds).map{result =>
-        result.map{case (pass, _) => pass} should contain allOf("pooh", "credit", "sxs123")
-      }
-    }*/
+  it should "return password-hash pairs for successful hashing operations" in {
+    hashPasswordListReliably(Seq("pooh", "credit", "sxs123", "xczxc", "wqeqwe", "asdgglglgl", "xxxq"), 10, 10.seconds).map { result =>
+      result.map { case (pass, _) => pass } should contain oneOf("pooh", "credit", "sxs123")
+    }
+  }
 }
