@@ -22,16 +22,18 @@ trait Recoverable[F[_]] {
 object Recoverable {
 
   implicit class RecoverableOps[F[_], A](fa: F[A])(implicit F: Recoverable[F]) {
-    def map[B](f: A => B): F[B] = ???
+    def map[B](f: A => B): F[B] = fa.map(f)
 
-    def flatMap[B](f: A => F[B]): F[B] = ???
+    def flatMap[B](f: A => F[B]): F[B] = fa.flatMap(f)
 
-    def recover(pf: PartialFunction[Throwable, A]): F[A] = ???
+    def recover(pf: PartialFunction[Throwable, A]): F[A] = fa.recover(pf)
 
-    def recoverWith(pf: PartialFunction[Throwable, F[A]]): F[A] = ???
+    def recoverWith(pf: PartialFunction[Throwable, F[A]]): F[A] = fa.recoverWith(pf)
   }
 
-  implicit def recoverableForTry: Recoverable[Try] = ??? // TODO
+  implicit def recoverableForTry: Recoverable[Try] = {
+
+  } // TODO
 
   implicit def recoverableForFuture(implicit ec: ExecutionContext): Recoverable[Future] = ??? // TODO
 
