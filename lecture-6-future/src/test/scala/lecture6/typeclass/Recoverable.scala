@@ -33,7 +33,7 @@ object Recoverable {
   }
 
   implicit def recoverableForTry: Recoverable[Try] = new Recoverable[Try] {
-    override def `new`[T](value: T): Try[T] = Try(value)
+    override def `new`[T](value: T): Try[T] = Success(value)
 
     override def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa.map(f)
 
@@ -47,7 +47,7 @@ object Recoverable {
   }
 
   implicit def recoverableForFuture(implicit ec: ExecutionContext): Recoverable[Future] = new Recoverable[Future] {
-    override def `new`[T](value: T): Future[T] = Future(value)
+    override def `new`[T](value: T): Future[T] = Future.successful(value)
 
     override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
 

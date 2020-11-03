@@ -1,11 +1,14 @@
 package lecture6.future.assignment
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise, TimeoutException}
+import scala.util.{Failure, Success, Try}
+
 import com.github.t3hnar.bcrypt._
 import com.typesafe.scalalogging.StrictLogging
 import lecture6.future.bcrypt.AsyncBcrypt
 import lecture6.future.store.AsyncCredentialStore
+import lecture6.future.util.Scheduler
 
 class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
                 (implicit executionContext: ExecutionContext) extends StrictLogging {
@@ -57,16 +60,19 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    * если подходит несколько - возвращается любой
    */
   def findMatchingPassword(passwords: Seq[String], hash: String): Future[Option[String]] = {
-    Future(passwords.collectFirst {
-      case password if password.isBcrypted(hash) => password
-    })
-    /*    for {
-          hashPasswordList <- hashPasswordList(passwords)
-        } yield {
-          hashPasswordList.collectFirst {
-            case (password, passwordHash) if password.isBcrypted(hash) => password
-          }
-        }*/
+    passwords.foldLeft(Future.successful(None): Future[Option[String]]){
+      case (matchingPassword, password: String) =>
+        matchingPassword.flatMap{
+          case None =>
+            bcrypt.verify(password, hash).map{isVerified =>
+              if (isVerified)
+                Some(password)
+              else
+                None
+            }
+          case Some(m) => Future.successful(Some(m))
+        }
+    }
   }
 
   /**
@@ -108,9 +114,11 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    * по истечению таймаута возвращает Future.failed с java.util.concurrent.TimeoutException
    */
   def withTimeout[A](f: Future[A], timeout: FiniteDuration): Future[A] = {
-    Future(Await.result(f, timeout))
+    val promise = Promise[A]
+    Scheduler.executeAfter(timeout){
+      promise.completeWith(f).failure(new TimeoutException)    }
+    promise.future
   }
-
 
   /**
    * делает то же, что и hashPasswordList, но дополнительно:
@@ -119,8 +127,16 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    *   - возвращаются все успешные результаты
    */
   def hashPasswordListReliably(passwords: Seq[String], retries: Int, timeout: FiniteDuration): Future[Seq[(String, String)]] = {
-    Future.sequence(passwords.map { password =>
-      withRetry(withTimeout(bcrypt.hash(password).map((password, _)), timeout), retries)
-    })
+    def futureToFutureTry[T](f: Future[T]): Future[Try[T]] =
+      f.map(Success(_)).recover { case x => Failure(x)}
+
+    val seqOfHashes: Seq[Future[(String, String)]] = passwords.map { password =>
+      withRetry(withTimeout(bcrypt.hash(password).map((password, _)),
+        timeout), retries)
+    }
+
+    val seqOfHashesTry = seqOfHashes.map(futureToFutureTry)
+
+    Future.sequence(seqOfHashesTry).map(_.filter(_.isSuccess).map(_.get))
   }
 }
