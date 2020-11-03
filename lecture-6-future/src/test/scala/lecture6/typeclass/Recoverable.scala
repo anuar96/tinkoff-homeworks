@@ -61,5 +61,5 @@ object Recoverable {
   }
 
   // Дополнительное задание повышенной сложности
-  implicit def recoverableForCompletableFuture: Recoverable[CompletableFuture] = ??? // TODO
+//  implicit def recoverableForCompletableFuture: Recoverable[CompletableFuture] = ??? // TODO
 }
