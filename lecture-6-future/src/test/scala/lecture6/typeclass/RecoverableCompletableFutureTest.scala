@@ -1,3 +1,4 @@
+/*
 package lecture6.typeclass
 
 import java.util.concurrent.CompletableFuture
@@ -19,3 +20,4 @@ class RecoverableCompletableFutureTest extends RecoverableTest[CompletableFuture
     }
   }
 }
+*/
