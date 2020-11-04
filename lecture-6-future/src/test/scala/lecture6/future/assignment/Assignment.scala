@@ -115,8 +115,10 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
    */
   def withTimeout[A](f: Future[A], timeout: FiniteDuration): Future[A] = {
     val promise = Promise[A]
+    promise.completeWith(f)
     Scheduler.executeAfter(timeout){
-      promise.completeWith(f).failure(new TimeoutException)    }
+      promise.failure(new TimeoutException)
+    }
     promise.future
   }
 
@@ -137,6 +139,8 @@ class Assignment(bcrypt: AsyncBcrypt, credentialStore: AsyncCredentialStore)
 
     val seqOfHashesTry = seqOfHashes.map(futureToFutureTry)
 
-    Future.sequence(seqOfHashesTry).map(_.filter(_.isSuccess).map(_.get))
+    Future.sequence(seqOfHashesTry).map(_.collect{
+      case Success(value) => value
+    })
   }
 }
