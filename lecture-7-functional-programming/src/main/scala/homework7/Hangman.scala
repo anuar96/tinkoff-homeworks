@@ -2,10 +2,11 @@ package homework7
 
 import monix.eval.Task
 import monix.execution.Scheduler
-
 import scala.concurrent.duration.Duration
 import scala.io.StdIn
 import scala.util.Random
+
+import homework7.Hangman.GuessResult.{Correct, Incorrect, Lost, Unchanged, Won}
 
 object Console {
   def putStrLn(string: String): Task[Unit] = Task(println(string))
@@ -24,14 +25,14 @@ object Hangman {
    * Реализация должна принимать один символ от пользователя и возвращать его в нижнем регистре
    * Воспользуйтесь классом Console
    */
-  val getChoice: Task[Char] = ??? // TODO
+  val getChoice: Task[Char] = Console.getChar.map(_.toLower)
 
   /**
    * TODO 2
    *
    * Реализация должна запрашивать у пользователя имя и возвращать его. Воспользуйтесь классом Console.
    */
-  val getName: Task[String] = ??? // TODO
+  val getName: Task[String] = Console.getStrLn // TODO
 
   /**
    * TODO 3
@@ -39,7 +40,10 @@ object Hangman {
    * Реализация должна возвращать случайное слово из справочника Dictionary. Воспользуйтесь Task.apply, чтобы разные
    * вызовы возвращали разные слова.
    */
-  val chooseWord: Task[String] = ??? // TODO
+  val chooseWord: Task[String] = {
+    lazy val rnd = new Random
+    Task(Dictionary(rnd.nextInt(Dictionary.size)))
+  }
 
   /**
    * TODO 4
@@ -48,7 +52,31 @@ object Hangman {
    * Для принятия решения о продолжении цикла используйте функцию analyzeNewInput
    * Для реализации этого метода вам понадобится рекурсия.
    */
-  def gameLoop(oldState: State): Task[Unit] = ??? // TODO
+  def gameLoop(oldState: State): Task[Unit] = {
+    getChoice.flatMap{char =>
+      val newState = oldState.addChar(char)
+      renderState(newState).flatMap{_ =>
+        analyzeNewInput(oldState, newState, char) match{
+          case Incorrect =>
+            gameLoop(newState)
+          case Won =>
+            Task {
+              println("WON")
+              println(s"the word was: ${newState.word}")
+            }
+          case Lost =>
+            Task{
+              println("LOST")
+              println(s"the word was: ${newState.word}")
+            }
+          case Correct =>
+            gameLoop(newState)
+          case Unchanged =>
+            gameLoop(newState)
+        }
+      }
+    }
+  }
 
   def renderState(state: State): Task[Unit] = {
 
@@ -130,6 +158,4 @@ object Hangman {
     import Scheduler.Implicits.global
     program.runSyncUnsafe(Duration.Inf)
   }
-
-
 }
