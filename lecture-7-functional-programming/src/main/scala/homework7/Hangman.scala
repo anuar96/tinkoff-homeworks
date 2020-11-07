@@ -32,7 +32,7 @@ object Hangman {
    *
    * Реализация должна запрашивать у пользователя имя и возвращать его. Воспользуйтесь классом Console.
    */
-  val getName: Task[String] = Console.getStrLn // TODO
+  val getName: Task[String] = Console.getStrLn
 
   /**
    * TODO 3
