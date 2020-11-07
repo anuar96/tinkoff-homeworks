@@ -69,11 +69,10 @@ class ParMappableForValidatedTest extends AnyFunSpec {
   describe("mapN") {
     it("available on tuple") {
       assert(
-//        (
-//          Validated.valid(10),
-//          Validated.valid(20)
-//          ).mapN(_ + _) == Validated.valid(30)
-        false // TODO uncomment code
+        (
+          Validated.valid(10),
+          Validated.valid(20)
+          ).mapN(_ + _) == Validated.valid(30)
       )
     }
   }
