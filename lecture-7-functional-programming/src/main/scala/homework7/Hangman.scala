@@ -26,7 +26,7 @@ object Hangman {
    * Воспользуйтесь классом Console
    */
   val getChoice: Task[Char] = {
-    Console.putStrLn(s"enter your guess letter").flatMap{_ =>
+    Console.putStrLn(s"enter your guess letter").flatMap { _ =>
       Console.getChar.map(_.toLower)
     }
   }
@@ -36,7 +36,7 @@ object Hangman {
    *
    * Реализация должна запрашивать у пользователя имя и возвращать его. Воспользуйтесь классом Console.
    */
-  val getName: Task[String] = Console.putStrLn(s"enter your name").flatMap{_ => Console.getStrLn}
+  val getName: Task[String] = Console.putStrLn(s"enter your name").flatMap { _ => Console.getStrLn }
 
   /**
    * TODO 3
@@ -57,32 +57,34 @@ object Hangman {
    * Для реализации этого метода вам понадобится рекурсия.
    */
   def gameLoop(oldState: State): Task[Unit] = {
-    for{
+    for {
       char <- getChoice
-      newState = oldState.addChar(char)
+      newState <- Task(oldState.addChar(char))
       _ <- renderState(newState)
-    } yield{
-      analyzeNewInput(oldState, newState, char) match{
+      guessResult = analyzeNewInput(oldState, newState, char)
+      _ <- guessResult match {
         case Incorrect =>
-          gameLoop(newState)
+          Console.putStrLn("Incorrect").flatMap { _ =>
+            gameLoop(newState)
+          }
         case Won =>
-          Task {
-            Console.putStrLn("WON").flatMap{_ =>
-              Console.putStrLn(s"the word was: ${newState.word}")
-            }
+          Console.putStrLn("WON").flatMap { _ =>
+            Console.putStrLn(s"the word was: ${newState.word}")
           }
         case Lost =>
-          Task{
-            Console.putStrLn("LOST").flatMap{_ =>
-              Console.putStrLn(s"the word was: ${newState.word}")
-            }
+          Console.putStrLn("LOST").flatMap { _ =>
+            Console.putStrLn(s"the word was: ${newState.word}")
           }
         case Correct =>
-          gameLoop(newState)
+          Console.putStrLn("Correct").flatMap { _ =>
+            gameLoop(newState)
+          }
         case Unchanged =>
-          gameLoop(newState)
+          Console.putStrLn("Unchanged").flatMap { _ =>
+            gameLoop(newState)
+          }
       }
-    }
+    } yield {}
   }
 
   def renderState(state: State): Task[Unit] = {
