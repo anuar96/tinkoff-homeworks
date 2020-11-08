@@ -45,8 +45,10 @@ object Hangman {
    * вызовы возвращали разные слова.
    */
   val chooseWord: Task[String] = {
-    lazy val rnd = new Random
-    Task(Dictionary(rnd.nextInt(Dictionary.size)))
+    Task {
+      val rnd = new Random
+      Dictionary(rnd.nextInt(Dictionary.size))
+    }
   }
 
   /**
