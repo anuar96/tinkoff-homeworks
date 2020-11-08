@@ -25,14 +25,18 @@ object Hangman {
    * Реализация должна принимать один символ от пользователя и возвращать его в нижнем регистре
    * Воспользуйтесь классом Console
    */
-  val getChoice: Task[Char] = Console.getChar.map(_.toLower)
+  val getChoice: Task[Char] = {
+    Console.putStrLn(s"enter your guess letter").flatMap{_ =>
+      Console.getChar.map(_.toLower)
+    }
+  }
 
   /**
    * TODO 2
    *
    * Реализация должна запрашивать у пользователя имя и возвращать его. Воспользуйтесь классом Console.
    */
-  val getName: Task[String] = Console.getStrLn
+  val getName: Task[String] = Console.putStrLn(s"enter your name").flatMap{_ => Console.getStrLn}
 
   /**
    * TODO 3
@@ -53,27 +57,30 @@ object Hangman {
    * Для реализации этого метода вам понадобится рекурсия.
    */
   def gameLoop(oldState: State): Task[Unit] = {
-    getChoice.flatMap{char =>
-      val newState = oldState.addChar(char)
-      renderState(newState).flatMap{_ =>
-        analyzeNewInput(oldState, newState, char) match{
-          case Incorrect =>
-            gameLoop(newState)
-          case Won =>
-            Task {
-              println("WON")
-              println(s"the word was: ${newState.word}")
+    for{
+      char <- getChoice
+      newState = oldState.addChar(char)
+      _ <- renderState(newState)
+    } yield{
+      analyzeNewInput(oldState, newState, char) match{
+        case Incorrect =>
+          gameLoop(newState)
+        case Won =>
+          Task {
+            Console.putStrLn("WON").flatMap{_ =>
+              Console.putStrLn(s"the word was: ${newState.word}")
             }
-          case Lost =>
-            Task{
-              println("LOST")
-              println(s"the word was: ${newState.word}")
+          }
+        case Lost =>
+          Task{
+            Console.putStrLn("LOST").flatMap{_ =>
+              Console.putStrLn(s"the word was: ${newState.word}")
             }
-          case Correct =>
-            gameLoop(newState)
-          case Unchanged =>
-            gameLoop(newState)
-        }
+          }
+        case Correct =>
+          gameLoop(newState)
+        case Unchanged =>
+          gameLoop(newState)
       }
     }
   }

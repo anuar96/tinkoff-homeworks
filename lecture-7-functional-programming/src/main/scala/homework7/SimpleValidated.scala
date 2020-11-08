@@ -21,6 +21,7 @@ object ParMappable {
     override def map2[A, B, C](a: Validated[A], b: Validated[B])(f: (A, B) => C): Validated[C] = {
       (a,b) match {
         case (Valid(valueA), Valid(valueB)) => Validated.valid(f(valueA, valueB))
+        case (Invalid(e1), Invalid(e2)) => Invalid(e1 ++ e2)
         case (Invalid(e), _) => Invalid(e)
         case (_, Invalid(e)) => Invalid(e)
       }
