@@ -16,3 +16,5 @@
     В качестве спецификации api нужно опираться на `homework10.hangman.api.AdminApiSpec` и
     интеграционный тест `homework10.hangman.HangmanIntegrationTest`
 
+
+Интерфейсы реализованы на Future, но если кто-то хочет сделать на monix Task, ZIO,  cats IO - welcome
