@@ -1,0 +1,12 @@
+POST http://localhost:8080/coffee/please
+Content-Type: application/json
+
+{
+    "coffeeType": "Cappuccino",
+    "size": "Medium",
+    "name": "Donald"
+}
+
+###
+
+GET http://localhost:8080/coffee/535146822

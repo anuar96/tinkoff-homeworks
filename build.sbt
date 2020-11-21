@@ -18,7 +18,8 @@ lazy val `scala-fintech-school` = project
     `lecture-6-future`,
     `lecture-7-functional-programming`,
     `lecture-8-concurrency`,
-    `lecture-9-rdbms`
+    `lecture-9-rdbms`,
+    `lecture-10-http`
   )
 
 lazy val `lecture-1` = project
@@ -30,3 +31,4 @@ lazy val `lecture-6-future` = project
 lazy val `lecture-7-functional-programming` = project
 lazy val `lecture-8-concurrency` = project
 lazy val `lecture-9-rdbms` = project
+lazy val `lecture-10-http` = project
