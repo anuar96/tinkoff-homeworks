@@ -26,7 +26,7 @@ object HttpApp extends App {
   val coffeeShopRoutes = pathPrefix("api" / "v1") {
     coffeeShopRoutesV1
   }
-  val bookingRoutes = wire[Booking].route
+//  val bookingRoutes = wire[Booking].route
 
   val allRoutes: Set[Route] = wireSet[Route]
 
