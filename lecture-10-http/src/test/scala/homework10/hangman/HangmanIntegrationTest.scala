@@ -23,7 +23,6 @@ class HangmanIntegrationTest extends AsyncFunSuite with BeforeAndAfterAll {
   test("Player can win hangman game") {
     for {
       initialGame <- startGame()
-      _ = println(initialGame.state)
       _ = assert(initialGame.state.word.forall(_ == '*'))
       _ = assert(initialGame.status == GameStatus.InProgress)
       realGame <- getGameFromAdmin(initialGame.id)
@@ -34,9 +33,9 @@ class HangmanIntegrationTest extends AsyncFunSuite with BeforeAndAfterAll {
     } yield {
       val stateHistory = gameHistory.map(_.state)
       val expectedStates = recreateStates(guesses, realGame.state)
-      assert(expectedStates == stateHistory)
+      assert(stateHistory == expectedStates)
       val expectedGameState = initialGame.copy(state = State(playerName, guesses.toSet, realWord), status = GameStatus.Won)
-      assert(expectedGameState == finishedGame)
+      assert(finishedGame == expectedGameState)
     }
   }
 
@@ -53,9 +52,9 @@ class HangmanIntegrationTest extends AsyncFunSuite with BeforeAndAfterAll {
     } yield {
       val stateHistory = gameHistory.map(_.state)
       val expectedStates = recreateStates(guesses, realGame.state)
-      assert(expectedStates == stateHistory)
+      assert(stateHistory == expectedStates)
       val expectedGameState = initialGame.copy(state = initialGame.state.copy(guesses = guesses.toSet), status = GameStatus.Lost)
-      assert(expectedGameState == finishedGame)
+      assert(finishedGame == expectedGameState)
 
     }
   }
